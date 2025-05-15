@@ -7,12 +7,12 @@ export default function Countdown() {
     minutes,
     seconds,
     isTimerRunning,
-    isPaused,
     elapsedTime,
     progressPercentage,
     startCountdown,
     pauseCountdown,
     resetCountdown,
+    timerRef,
   } = useCountdown({
     hours: 0,
     minutes: 1,
@@ -52,7 +52,7 @@ export default function Countdown() {
           disabled={isTimerRunning}
           onClick={handleOnClickStart}
         >
-          {isPaused ? "Resume" : "Start"}
+          {timerRef.current ? "Resume" : "Start"}
         </button>
         <button
           className="btn"

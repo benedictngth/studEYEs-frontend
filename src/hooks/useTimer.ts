@@ -16,7 +16,6 @@ export const useCountdown = (options?: CountdownOptions) => {
   const oneMS = 1000;
 
   const [remainingSeconds, setRemainingSeconds] = useState(totalInitialSeconds);
-  const [isPaused, setIsPaused] = useState(false);
   const [hours, setHours] = useState(Math.floor(totalInitialSeconds / 3600));
   const [minutes, setMinutes] = useState(Math.floor((totalInitialSeconds % 3600) / 60));
   const [seconds, setSeconds] = useState(totalInitialSeconds % 60);
@@ -24,11 +23,9 @@ export const useCountdown = (options?: CountdownOptions) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [progressPercentage, setProgressPercentage] = useState(0);
 
-  // timerRef used to store the total time remaining
+  // timerRef used to store the total time remaining and whether the timer is running
   const timerRef = useRef<number | null>(null);
-  //useRef is used to store a mutable value that does not cause re-renders when changed
-  // It is used to keep track of whether the countdown has completed
-  // without causing a re-render of the component
+  //used to keep track of whether the countdown has completed
   const completedRef = useRef<boolean>(false);
 
   const updateTime = (total: number) => {
@@ -39,12 +36,11 @@ export const useCountdown = (options?: CountdownOptions) => {
 
   const updateProgress = (elapsed: number) => {
     setElapsedTime(elapsed);
-    setProgressPercentage(Math.min(100, Math.round((elapsed / totalInitialSeconds) * 100)));
+    setProgressPercentage(Math.round((elapsed / totalInitialSeconds) * 100));
   };
 
   const startCountdown = () => {
     setIsTimerRunning(true);
-    setIsPaused(false);
     completedRef.current = false;
     
     timerRef.current = setInterval(() => {
@@ -86,9 +82,8 @@ export const useCountdown = (options?: CountdownOptions) => {
 
   const pauseCountdown = () => {
     clearInterval(timerRef.current!);
-    timerRef.current = null;
+    timerRef.current = 1;
     setIsTimerRunning(false);
-    setIsPaused(true);
   };
 
   useEffect(() => {
@@ -103,11 +98,11 @@ export const useCountdown = (options?: CountdownOptions) => {
     minutes,
     seconds,
     isTimerRunning,
-    isPaused,
     elapsedTime,
     progressPercentage,
     startCountdown,
     pauseCountdown,
     resetCountdown,
+    timerRef
   };
 };
