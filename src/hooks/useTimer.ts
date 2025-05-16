@@ -1,22 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
 
 interface CountdownOptions {
-  hours?: number;
   minutes?: number;
   seconds?: number;
   onComplete?: () => void;
 }
 
 export const useCountdown = (options?: CountdownOptions) => {
-  const totalInitialSeconds = 
-    (options?.hours ?? 0) * 3600 + 
-    (options?.minutes ?? 25) * 60 + 
-    (options?.seconds ?? 0);
+  const [totalInitialSeconds, setTotalInitialSeconds] = useState(
+    (options?.minutes ?? 25) * 60 + (options?.seconds ?? 0)
+  );
 
   const oneMS = 1000;
 
   const [remainingSeconds, setRemainingSeconds] = useState(totalInitialSeconds);
-  const [hours, setHours] = useState(Math.floor(totalInitialSeconds / 3600));
   const [minutes, setMinutes] = useState(Math.floor((totalInitialSeconds % 3600) / 60));
   const [seconds, setSeconds] = useState(totalInitialSeconds % 60);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -27,9 +24,9 @@ export const useCountdown = (options?: CountdownOptions) => {
   const timerRef = useRef<number | null>(null);
   //used to keep track of whether the countdown has completed
   const completedRef = useRef<boolean>(false);
+  const totalInitialSecondsRef = useRef(totalInitialSeconds);
 
   const updateTime = (total: number) => {
-    setHours(Math.floor(total / 3600));
     setMinutes(Math.floor((total % 3600) / 60));
     setSeconds(total % 60);
   };
@@ -52,7 +49,7 @@ export const useCountdown = (options?: CountdownOptions) => {
           }
           setIsTimerRunning(false);
           updateTime(0);
-          updateProgress(totalInitialSeconds);
+          updateProgress(totalInitialSecondsRef.current);
           
           if (options?.onComplete && !completedRef.current) {
             completedRef.current = true;
@@ -63,7 +60,7 @@ export const useCountdown = (options?: CountdownOptions) => {
         // update remaining time
         const newTime = prevTime - 1;
         updateTime(newTime);
-        updateProgress(totalInitialSeconds - newTime);
+        updateProgress(totalInitialSecondsRef.current - newTime);
         return newTime;
       });
     }, oneMS);
@@ -73,8 +70,9 @@ export const useCountdown = (options?: CountdownOptions) => {
     clearInterval(timerRef.current!);
     timerRef.current = null;
     setIsTimerRunning(false);
-    setRemainingSeconds(totalInitialSeconds);
-    updateTime(totalInitialSeconds);
+    const resetTime = totalInitialSecondsRef.current; // ✅ use the latest
+    setRemainingSeconds(resetTime);
+    updateTime(resetTime);
     setElapsedTime(0);
     setProgressPercentage(0);
     completedRef.current = false;
@@ -93,8 +91,20 @@ export const useCountdown = (options?: CountdownOptions) => {
     };
   }, []);
 
+  const setInitialTime = (minutes: number, seconds: number) => {
+    const newTotalSeconds = minutes * 60 + seconds;
+    clearInterval(timerRef.current!);
+    timerRef.current = null;
+    setTotalInitialSeconds(newTotalSeconds);
+    totalInitialSecondsRef.current = newTotalSeconds;
+    setRemainingSeconds(newTotalSeconds);
+    updateTime(newTotalSeconds);
+    setElapsedTime(0);
+    setProgressPercentage(0);
+    completedRef.current = false;
+  };
+
   return {
-    hours,
     minutes,
     seconds,
     isTimerRunning,
@@ -103,6 +113,7 @@ export const useCountdown = (options?: CountdownOptions) => {
     startCountdown,
     pauseCountdown,
     resetCountdown,
-    timerRef
+    timerRef,
+    setInitialTime,
   };
 };
