@@ -6,6 +6,11 @@ interface CountdownOptions {
   onComplete?: () => void;
 }
 
+//using observable pattern to track completion of the timer https://www.patterns.dev/vanilla/observer-pattern/
+//or use prop drilling to better pass the countdown length from parent component Timer Component to child (BreakTimer/StudyTimer) components
+
+  //figure out how to auto-reset the timer when the timer is complete
+  //refactor timeRef to not use null values
 export const useCountdown = (options?: CountdownOptions) => {
   const [totalInitialSeconds, setTotalInitialSeconds] = useState(
     (options?.minutes ?? 25) * 60 + (options?.seconds ?? 0)
