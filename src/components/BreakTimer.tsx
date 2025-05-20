@@ -12,7 +12,6 @@ export default function BreakTimer({ onComplete }: TimerProps) {
     startCountdown,
     pauseCountdown,
     resetCountdown,
-    timerRef,
   } = useCountdown({
     minutes: 0,
     seconds: 5,
@@ -37,7 +36,7 @@ export default function BreakTimer({ onComplete }: TimerProps) {
           disabled={isTimerRunning}
           className="btn btn-primary"
         >
-          {timerRef.current ? "Resume" : "Start"}
+          {isTimerRunning ? "Resume" : "Start"}
         </button>
         <button
           onClick={resetCountdown}

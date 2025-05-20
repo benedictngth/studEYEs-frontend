@@ -11,7 +11,6 @@ export default function StudyTimer({ onComplete }: TimerProps) {
     startCountdown,
     pauseCountdown,
     resetCountdown,
-    timerRef,
   } = useCountdown({
     minutes: 0,
     seconds: 25,
@@ -36,7 +35,7 @@ export default function StudyTimer({ onComplete }: TimerProps) {
           disabled={isTimerRunning}
           className="btn btn-primary"
         >
-          {timerRef.current ? "Resume" : "Start"}
+          {isTimerRunning ? "Resume" : "Start"}
         </button>
         <button
           onClick={resetCountdown}

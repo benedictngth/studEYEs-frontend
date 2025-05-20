@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 
 interface CountdownOptions {
-  minutes?: number;
-  seconds?: number;
+  minutes: number;
+  seconds: number;
   onComplete?: () => void;
 }
 
@@ -11,25 +11,22 @@ interface CountdownOptions {
 
   //figure out how to auto-reset the timer when the timer is complete
   //refactor timeRef to not use null values
-export const useCountdown = (options?: CountdownOptions) => {
-  const [totalInitialSeconds, setTotalInitialSeconds] = useState(
-    (options?.minutes ?? 25) * 60 + (options?.seconds ?? 0)
-  );
+export const useCountdown = (options: CountdownOptions) => {
+  const initialTotalSecond = options.minutes * 60 + options.seconds;
 
   const oneMS = 1000;
 
-  const [remainingSeconds, setRemainingSeconds] = useState(totalInitialSeconds);
-  const [minutes, setMinutes] = useState(Math.floor((totalInitialSeconds % 3600) / 60));
-  const [seconds, setSeconds] = useState(totalInitialSeconds % 60);
+  const [remainingTotal, setRemainingTotal] = useState(initialTotalSecond);
+  const [minutes, setMinutes] = useState(Math.floor((initialTotalSecond % 3600) / 60));
+  const [seconds, setSeconds] = useState(initialTotalSecond % 60);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [progressPercentage, setProgressPercentage] = useState(0);
 
   // timerRef used to store the total time remaining and whether the timer is running
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null)
   //used to keep track of whether the countdown has completed
   const completedRef = useRef<boolean>(false);
-  const totalInitialSecondsRef = useRef(totalInitialSeconds);
 
   const updateTime = (total: number) => {
     setMinutes(Math.floor((total % 3600) / 60));
@@ -38,7 +35,7 @@ export const useCountdown = (options?: CountdownOptions) => {
 
   const updateProgress = (elapsed: number) => {
     setElapsedTime(elapsed);
-    setProgressPercentage(Math.round((elapsed / totalInitialSeconds) * 100));
+    setProgressPercentage(Math.round((elapsed / initialTotalSecond) * 100));
   };
 
   const startCountdown = () => {
@@ -46,7 +43,7 @@ export const useCountdown = (options?: CountdownOptions) => {
     completedRef.current = false;
     
     timerRef.current = setInterval(() => {
-      setRemainingSeconds((prevTime) => {
+      setRemainingTotal((prevTime) => {
         if (prevTime === 0) {
           if (timerRef.current) {
             clearInterval(timerRef.current);
@@ -54,7 +51,7 @@ export const useCountdown = (options?: CountdownOptions) => {
           }
           setIsTimerRunning(false);
           updateTime(0);
-          updateProgress(totalInitialSecondsRef.current);
+          updateProgress(remainingTotal);
           
           if (options?.onComplete && !completedRef.current) {
             completedRef.current = true;
@@ -65,7 +62,7 @@ export const useCountdown = (options?: CountdownOptions) => {
         // update remaining time
         const newTime = prevTime - 1;
         updateTime(newTime);
-        updateProgress(totalInitialSecondsRef.current - newTime);
+        updateProgress(remainingTotal - newTime);
         return newTime;
       });
     }, oneMS);
@@ -75,9 +72,8 @@ export const useCountdown = (options?: CountdownOptions) => {
     clearInterval(timerRef.current!);
     timerRef.current = null;
     setIsTimerRunning(false);
-    const resetTime = totalInitialSecondsRef.current; // ✅ use the latest
-    setRemainingSeconds(resetTime);
-    updateTime(resetTime);
+    setRemainingTotal(initialTotalSecond);
+    updateTime(initialTotalSecond);
     setElapsedTime(0);
     setProgressPercentage(0);
     completedRef.current = false;
@@ -96,19 +92,6 @@ export const useCountdown = (options?: CountdownOptions) => {
     };
   }, []);
 
-  const setInitialTime = (minutes: number, seconds: number) => {
-    const newTotalSeconds = minutes * 60 + seconds;
-    clearInterval(timerRef.current!);
-    timerRef.current = null;
-    setTotalInitialSeconds(newTotalSeconds);
-    totalInitialSecondsRef.current = newTotalSeconds;
-    setRemainingSeconds(newTotalSeconds);
-    updateTime(newTotalSeconds);
-    setElapsedTime(0);
-    setProgressPercentage(0);
-    completedRef.current = false;
-  };
-
   return {
     minutes,
     seconds,
@@ -119,6 +102,5 @@ export const useCountdown = (options?: CountdownOptions) => {
     pauseCountdown,
     resetCountdown,
     timerRef,
-    setInitialTime,
   };
 };
