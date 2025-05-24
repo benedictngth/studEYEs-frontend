@@ -11,17 +11,28 @@ export default function StudyTimer({ onComplete }: TimerProps) {
     startCountdown,
     pauseCountdown,
     resetCountdown,
+    progressPercentage,
   } = useCountdown({
     minutes: 0,
     seconds: 25,
     onComplete,
   });
 
+  const displayTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    
   return (
     <div>
-      <h1 className="text-4xl text-center font-bold">
-        {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
-      </h1>
+      <div
+        className="radial-progress bg-primary text-primary-content border-primary border-4 mb-6"
+        style={{
+          "--value": progressPercentage,
+          "--size": "20rem",
+          "--thickness": "15px",
+        } as React.CSSProperties}
+      >
+        <span className="text-5xl font-bold">{displayTime}</span>
+      </div>
+
       <div className="space-x-4 mt-2 text-center">
         <button
           onClick={pauseCountdown}

@@ -39,30 +39,33 @@ export const useCountdown = (options: CountdownOptions) => {
   };
 
   const startCountdown = () => {
+    console.log("⏱️ startCountdown called");
+    if (isTimerRunning) return;
     setIsTimerRunning(true);
     completedRef.current = false;
     
-    timerRef.current = setInterval(() => {
+    timerRef.current = window.setInterval(() => {
       setRemainingTotal((prevTime) => {
-        if (prevTime === 0) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = 0;
-          }
+        if (prevTime <= 1) {
+          clearInterval(timerRef.current!);
+          timerRef.current = null;
           setIsTimerRunning(false);
           updateTime(0);
-          updateProgress(remainingTotal);
-          
-          if (options?.onComplete && !completedRef.current) {
+          updateProgress(initialTotalSecond);
+
+          if (!completedRef.current && options?.onComplete) {
             completedRef.current = true;
-            options.onComplete();
+            setTimeout(() => {
+              options.onComplete?.(); // defer callback to avoid state-during-render
+            }, 0);
           }
+
           return 0;
         }
         // update remaining time
         const newTime = prevTime - 1;
         updateTime(newTime);
-        updateProgress(remainingTotal - newTime);
+        updateProgress(initialTotalSecond - newTime);
         return newTime;
       });
     }, oneMS);
@@ -81,7 +84,7 @@ export const useCountdown = (options: CountdownOptions) => {
 
   const pauseCountdown = () => {
     clearInterval(timerRef.current!);
-    timerRef.current = 1;
+    timerRef.current = null;
     setIsTimerRunning(false);
   };
 

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import StudyTimer from "./StudyTimer";
 import BreakTimer from "./BreakTimer";
+import { fetchUselessFact } from '../lib/chatgpt';
+
+console.log("API Key:", import.meta.env.VITE_OPENAI_API_KEY);
 
 export default function TimerComponent() {
   //onComplete prop is a function that will be called when the timer completes
@@ -9,15 +12,25 @@ export default function TimerComponent() {
   const [mode, setMode] = useState<TimerMode>("study");
   const [breakCompleteModal, setBreakCompleteModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [breakMsg, setBreakMsg] = useState("");
 
   const handleStudyComplete = () => setShowModal(true);
 
   const handleBreakComplete = () => setBreakCompleteModal(true);
 
+  const handleContinueToBreak = async () => {
+    setShowModal(false);
+    setMode("break");
+
+    const message = await fetchUselessFact("Give me a useless fun fact.");
+    setBreakMsg(message);
+    setMode("break");
+  };
+
   return (
     <div className="App mt-10 mx-auto text-center">
       {mode === "study" && <StudyTimer onComplete={handleStudyComplete} />}
-      {mode === "break" && <BreakTimer onComplete={handleBreakComplete} />}
+      {mode === "break" && <BreakTimer onComplete={handleBreakComplete} message = {breakMsg} />}
 
       {showModal && (
         <div className="fixed inset-0 flex justify-center items-center z-50">
@@ -27,10 +40,7 @@ export default function TimerComponent() {
               <div className="card-actions justify-end">
                 <button
                   className="btn btn-primary"
-                  onClick={() => {
-                    setShowModal(false);
-                    setMode("break");
-                  }}
+                  onClick={handleContinueToBreak}
                 >
                   Break Time!
                 </button>
