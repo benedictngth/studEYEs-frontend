@@ -22,8 +22,8 @@ export async function fetchUselessFact(prompt: string) {
     } catch (error: any) {
     console.error("Error calling OpenAI:", error);
     if (error.response?.status === 429) {
-      return "⚠️ You're sending too many requests. Try again in a moment.";
+      return "Too many req sent";
     }
-    return "⚠️ Could not fetch a message.";
+    return "Unable to fetch msg";
   }
 }

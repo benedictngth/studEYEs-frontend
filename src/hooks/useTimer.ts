@@ -39,7 +39,7 @@ export const useCountdown = (options: CountdownOptions) => {
   };
 
   const startCountdown = () => {
-    console.log("⏱️ startCountdown called");
+    console.log("startCountdown called");
     if (isTimerRunning) return;
     setIsTimerRunning(true);
     completedRef.current = false;

@@ -36,8 +36,8 @@ export default function BreakTimer({ onComplete, message }: TimerProps) {
       </div>
 
       {message && (
-        <div className="mt-4 p-4 bg-blue-100 text-blue-800 rounded shadow max-w-md text-center">
-          <p className="text-lg italic"> {message}</p>
+        <div className="mb-4 p-2 bg-blue-100 text-blue-800 rounded shadow max-w-md mx-auto text-center">
+          <p className="italic"> {message}</p>
         </div>
       )}
 
