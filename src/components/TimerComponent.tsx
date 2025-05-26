@@ -1,9 +1,7 @@
 import { useState } from "react";
 import StudyTimer from "./StudyTimer";
 import BreakTimer from "./BreakTimer";
-import { fetchUselessFact } from '../lib/chatgpt';
-
-console.log("API Key:", import.meta.env.VITE_OPENAI_API_KEY);
+import { fetchBreakFact } from "../lib/fetchBreakFact";
 
 export default function TimerComponent() {
   //onComplete prop is a function that will be called when the timer completes
@@ -22,7 +20,7 @@ export default function TimerComponent() {
     setShowModal(false);
     setMode("break");
 
-    const message = await fetchUselessFact("Give me a useless fun fact.");
+    const message = await fetchBreakFact("new unique response");
     setBreakMsg(message);
     setMode("break");
   };
@@ -30,7 +28,9 @@ export default function TimerComponent() {
   return (
     <div className="App mt-10 mx-auto text-center">
       {mode === "study" && <StudyTimer onComplete={handleStudyComplete} />}
-      {mode === "break" && <BreakTimer onComplete={handleBreakComplete} message = {breakMsg} />}
+      {mode === "break" && (
+        <BreakTimer onComplete={handleBreakComplete} message={breakMsg} />
+      )}
 
       {showModal && (
         <div className="fixed inset-0 flex justify-center items-center z-50">

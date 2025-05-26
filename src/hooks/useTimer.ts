@@ -5,12 +5,11 @@ interface CountdownOptions {
   seconds: number;
   onComplete?: () => void;
 }
-
+//todos
 //using observable pattern to track completion of the timer https://www.patterns.dev/vanilla/observer-pattern/
 //or use prop drilling to better pass the countdown length from parent component Timer Component to child (BreakTimer/StudyTimer) components
 
   //figure out how to auto-reset the timer when the timer is complete
-  //refactor timeRef to not use null values
 export const useCountdown = (options: CountdownOptions) => {
   const initialTotalSecond = options.minutes * 60 + options.seconds;
 
@@ -24,7 +23,7 @@ export const useCountdown = (options: CountdownOptions) => {
   const [progressPercentage, setProgressPercentage] = useState(0);
 
   // timerRef used to store the total time remaining and whether the timer is running
-  const timerRef = useRef<number | null>(null)
+  const timerRef = useRef<number>(initialTotalSecond)
   //used to keep track of whether the countdown has completed
   const completedRef = useRef<boolean>(false);
 
@@ -40,18 +39,17 @@ export const useCountdown = (options: CountdownOptions) => {
 
   const startCountdown = () => {
     console.log("startCountdown called");
-    if (isTimerRunning) return;
     setIsTimerRunning(true);
     completedRef.current = false;
     
     timerRef.current = window.setInterval(() => {
       setRemainingTotal((prevTime) => {
-        if (prevTime <= 1) {
+        if (prevTime === 0) {
           clearInterval(timerRef.current!);
-          timerRef.current = null;
+          timerRef.current = 0;
           setIsTimerRunning(false);
           updateTime(0);
-          updateProgress(initialTotalSecond);
+          updateProgress(remainingTotal);
 
           if (!completedRef.current && options?.onComplete) {
             completedRef.current = true;
@@ -65,7 +63,7 @@ export const useCountdown = (options: CountdownOptions) => {
         // update remaining time
         const newTime = prevTime - 1;
         updateTime(newTime);
-        updateProgress(initialTotalSecond - newTime);
+        updateProgress(remainingTotal - newTime);
         return newTime;
       });
     }, oneMS);
@@ -84,7 +82,7 @@ export const useCountdown = (options: CountdownOptions) => {
 
   const pauseCountdown = () => {
     clearInterval(timerRef.current!);
-    timerRef.current = null;
+    timerRef.current = 1;
     setIsTimerRunning(false);
   };
 
