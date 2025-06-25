@@ -9,6 +9,7 @@ export default function TimerComponent() {
   type TimerMode = "study" | "break";
   const [mode, setMode] = useState<TimerMode>("study");
   const [breakCompleteModal, setBreakCompleteModal] = useState(false);
+  const [breakLoading, setBreakLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [breakMsg, setBreakMsg] = useState("");
 
@@ -17,19 +18,38 @@ export default function TimerComponent() {
   const handleBreakComplete = () => setBreakCompleteModal(true);
 
   const handleContinueToBreak = async () => {
+    // Retrieve past break fact from localStorage
+    const pastBreakFact = JSON.parse(
+      localStorage.getItem("pastBreakFact") ||
+        JSON.stringify("No Past Break Fact")
+    );
+    console.log("pastBreakFact", pastBreakFact);
     setShowModal(false);
     setMode("break");
 
-    const message = await fetchBreakFact("new unique response");
-    setBreakMsg(message);
-    setMode("break");
+    // Fetch a new break fact, passing the past fact to avoid repetition
+    setBreakLoading(true);
+    try {
+      const message = await fetchBreakFact(
+        `new unique response. Do not repeat past prompts below under the [past prompts] section. [past prompts] ${pastBreakFact}`
+      );
+      localStorage.setItem("pastBreakFact", JSON.stringify(message));
+      setBreakMsg(message);
+      setMode("break");
+    } finally {
+      setBreakLoading(false);
+    }
   };
 
   return (
     <div className="App mt-10 mx-auto text-center">
       {mode === "study" && <StudyTimer onComplete={handleStudyComplete} />}
       {mode === "break" && (
-        <BreakTimer onComplete={handleBreakComplete} message={breakMsg} />
+        <BreakTimer
+          onComplete={handleBreakComplete}
+          message={breakMsg}
+          breakLoading={breakLoading}
+        />
       )}
 
       {showModal && (

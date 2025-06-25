@@ -3,9 +3,14 @@ import { useCountdown } from "../hooks/useTimer";
 interface TimerProps {
   onComplete: () => void;
   message?: string;
+  breakLoading?: boolean;
 }
 
-export default function BreakTimer({ onComplete, message }: TimerProps) {
+export default function BreakTimer({
+  onComplete,
+  message,
+  breakLoading,
+}: TimerProps) {
   const {
     minutes,
     seconds,
@@ -38,7 +43,9 @@ export default function BreakTimer({ onComplete, message }: TimerProps) {
         <span className="text-5xl font-bold">{displayTime}</span>
       </div>
 
-      {message && (
+      {breakLoading ? (
+        <span className="loading loading-spinner loading-sm"></span>
+      ) : (
         <div className="mb-4 p-2 bg-blue-100 text-blue-800 rounded shadow max-w-md mx-auto text-center">
           <p className="italic"> {message}</p>
         </div>

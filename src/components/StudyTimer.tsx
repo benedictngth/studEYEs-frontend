@@ -1,5 +1,7 @@
 import { useCountdown } from "../hooks/useTimer";
 
+import { useState } from "react";
+
 interface TimerProps {
   onComplete: () => void;
 }
@@ -18,17 +20,21 @@ export default function StudyTimer({ onComplete }: TimerProps) {
     onComplete,
   });
 
-  const displayTime = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-    
+  const displayTime = `${String(minutes).padStart(2, "0")}:${String(
+    seconds
+  ).padStart(2, "0")}`;
+  const [timercycle, setTimerCycle] = useState(0);
   return (
     <div>
       <div
         className="radial-progress bg-primary text-primary-content border-primary border-4 mb-6"
-        style={{
-          "--value": progressPercentage,
-          "--size": "20rem",
-          "--thickness": "15px",
-        } as React.CSSProperties}
+        style={
+          {
+            "--value": progressPercentage,
+            "--size": "20rem",
+            "--thickness": "15px",
+          } as React.CSSProperties
+        }
       >
         <span className="text-5xl font-bold">{displayTime}</span>
       </div>
