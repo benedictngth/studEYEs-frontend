@@ -1,7 +1,5 @@
 import { useCountdown } from "../hooks/useTimer";
 
-import { useState } from "react";
-
 interface TimerProps {
   onComplete: () => void;
 }
@@ -19,11 +17,9 @@ export default function StudyTimer({ onComplete }: TimerProps) {
     seconds: 25,
     onComplete,
   });
-
   const displayTime = `${String(minutes).padStart(2, "0")}:${String(
     seconds
   ).padStart(2, "0")}`;
-  const [timercycle, setTimerCycle] = useState(0);
   return (
     <div>
       <div

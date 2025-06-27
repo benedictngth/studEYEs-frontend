@@ -12,10 +12,14 @@ export default function TimerComponent() {
   const [breakLoading, setBreakLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [breakMsg, setBreakMsg] = useState("");
+  const [timercycle, setTimerCycle] = useState(0);
 
   const handleStudyComplete = () => setShowModal(true);
 
-  const handleBreakComplete = () => setBreakCompleteModal(true);
+  const handleBreakComplete = () => {
+    setBreakCompleteModal(true);
+    setTimerCycle((prev) => prev + 1);
+  };
 
   const handleContinueToBreak = async () => {
     // Retrieve past break fact from localStorage
@@ -98,6 +102,10 @@ export default function TimerComponent() {
           </div>
         </div>
       )}
+
+      <div className="font-bold py-2">
+        Number of cycles completed: {timercycle}
+      </div>
     </div>
   );
 }
