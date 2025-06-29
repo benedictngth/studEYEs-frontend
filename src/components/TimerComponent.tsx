@@ -1,24 +1,34 @@
 import { useState } from "react";
+import { useCountdown } from "../hooks/useTimer";
 import StudyTimer from "./StudyTimer";
 import BreakTimer from "./BreakTimer";
+import SummaryPage from "./SummaryPage";
 import { fetchBreakFact } from "../lib/fetchBreakFact";
 
 export default function TimerComponent() {
   //onComplete prop is a function that will be called when the timer completes
   //now when click end study session, TODO what happens next?
-  type TimerMode = "study" | "break";
+  type TimerMode = "study" | "break" | "summary";
   const [mode, setMode] = useState<TimerMode>("study");
   const [breakCompleteModal, setBreakCompleteModal] = useState(false);
   const [breakLoading, setBreakLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [breakMsg, setBreakMsg] = useState("");
   const [timercycle, setTimerCycle] = useState(0);
+  const [totalBreaks, setTotalBreaks] = useState(0);
+  const [totalStudyDuration, setTotalStudyDuration] = useState(0);
+  
+  const handleStudyComplete = () => {
+    setTimerCycle((prev) => prev + 1);
+    setTimeout(() => {
+      setTotalStudyDuration((prev) => prev + elapsedTime);
+      setElapsedTime(0);
+    }, 0);
+    setShowModal(true);
 
-  const handleStudyComplete = () => setShowModal(true);
-
+  }
   const handleBreakComplete = () => {
     setBreakCompleteModal(true);
-    setTimerCycle((prev) => prev + 1);
   };
 
   const handleContinueToBreak = async () => {
@@ -30,6 +40,7 @@ export default function TimerComponent() {
     console.log("pastBreakFact", pastBreakFact);
     setShowModal(false);
     setMode("break");
+    setTotalBreaks((prev) => prev + 1);
 
     // Fetch a new break fact, passing the past fact to avoid repetition
     setBreakLoading(true);
@@ -45,14 +56,60 @@ export default function TimerComponent() {
     }
   };
 
+  const {
+    minutes,
+    seconds,
+    isTimerRunning,
+    startCountdown,
+    pauseCountdown,
+    resetCountdown,
+    progressPercentage,
+    elapsedTime,
+  } = useCountdown({
+    minutes: 0,
+    seconds: 5,
+    onComplete: handleStudyComplete,
+  });
+
+
+  const handleEndSession = () => {
+    setShowModal(false);
+    setMode("summary");
+    resetCountdown();
+  }
+  
   return (
     <div className="App mt-10 mx-auto text-center">
-      {mode === "study" && <StudyTimer onComplete={handleStudyComplete} />}
+      {mode === "study" && (
+        <StudyTimer 
+          minutes={minutes}
+          seconds={seconds}
+          isTimerRunning={isTimerRunning}
+          startCountdown={startCountdown}
+          pauseCountdown={pauseCountdown}
+          resetCountdown={resetCountdown}
+          progressPercentage={progressPercentage}
+        />
+      )}
       {mode === "break" && (
         <BreakTimer
           onComplete={handleBreakComplete}
           message={breakMsg}
           breakLoading={breakLoading}
+        />
+      )}
+      {mode === "summary" && (
+        <SummaryPage
+        totalStudySessions = {timercycle}
+        totalBreaks = {totalBreaks}
+        totalStudyDuration= {totalStudyDuration}
+        onClose={() => {
+          setMode("study");
+          resetCountdown();
+          setTimerCycle(0);
+          setTotalBreaks(0);
+          setTotalStudyDuration(0);
+          }}
         />
       )}
 
@@ -70,10 +127,7 @@ export default function TimerComponent() {
                 </button>
                 <button
                   className="btn btn-ghost"
-                  onClick={() => {
-                    setShowModal(false);
-                    setMode("study");
-                  }}
+                  onClick={handleEndSession}
                 >
                   End Study Session
                 </button>
@@ -93,10 +147,20 @@ export default function TimerComponent() {
                 className="btn btn-primary"
                 onClick={() => {
                   setBreakCompleteModal(false);
+                  resetCountdown();
                   setMode("study"); // return to study session
                 }}
               >
                 Back to work!
+              </button>
+              <button
+                className="btn btn-ghost"
+                  onClick={() => {
+                    setBreakCompleteModal(false);
+                    setMode("study");
+                  }}
+                >
+                  End Study Session
               </button>
             </div>
           </div>

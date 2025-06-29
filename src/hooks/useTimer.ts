@@ -71,11 +71,9 @@ export const useCountdown = (options: CountdownOptions) => {
 
   const resetCountdown = () => {
     clearInterval(timerRef.current!);
-    timerRef.current = null;
     setIsTimerRunning(false);
     setRemainingTotal(initialTotalSecond);
     updateTime(initialTotalSecond);
-    setElapsedTime(0);
     setProgressPercentage(0);
     completedRef.current = false;
   };
@@ -98,6 +96,7 @@ export const useCountdown = (options: CountdownOptions) => {
     seconds,
     isTimerRunning,
     elapsedTime,
+    setElapsedTime,
     progressPercentage,
     startCountdown,
     pauseCountdown,

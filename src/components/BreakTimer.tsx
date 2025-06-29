@@ -21,7 +21,7 @@ export default function BreakTimer({
     progressPercentage,
   } = useCountdown({
     minutes: 0,
-    seconds: 5,
+    seconds: 2,
     onComplete,
   });
   const displayTime = `${String(minutes).padStart(2, "0")}:${String(

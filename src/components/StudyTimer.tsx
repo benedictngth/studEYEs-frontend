@@ -1,22 +1,21 @@
-import { useCountdown } from "../hooks/useTimer";
-
 interface TimerProps {
-  onComplete: () => void;
+  minutes: number;
+  seconds: number;
+  isTimerRunning: boolean;
+  startCountdown: () => void;
+  pauseCountdown: () => void;
+  resetCountdown: () => void;
+  progressPercentage: number;
 }
-export default function StudyTimer({ onComplete }: TimerProps) {
-  const {
-    minutes,
-    seconds,
-    isTimerRunning,
-    startCountdown,
-    pauseCountdown,
-    resetCountdown,
-    progressPercentage,
-  } = useCountdown({
-    minutes: 0,
-    seconds: 25,
-    onComplete,
-  });
+export default function StudyTimer({ 
+  minutes,
+  seconds,
+  isTimerRunning,
+  startCountdown,
+  pauseCountdown,
+  resetCountdown,
+  progressPercentage,
+ }: TimerProps) {
   const displayTime = `${String(minutes).padStart(2, "0")}:${String(
     seconds
   ).padStart(2, "0")}`;
