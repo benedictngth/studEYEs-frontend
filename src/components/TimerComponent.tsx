@@ -21,11 +21,10 @@ export default function TimerComponent() {
   const handleStudyComplete = () => {
     setTimerCycle((prev) => prev + 1);
     setTimeout(() => {
-      setTotalStudyDuration((prev) => prev + elapsedTime);
+      setTotalStudyDuration((prev) => prev + lastElapsedRef.current);
       setElapsedTime(0);
     }, 0);
     setShowModal(true);
-
   }
   const handleBreakComplete = () => {
     setBreakCompleteModal(true);
@@ -65,6 +64,8 @@ export default function TimerComponent() {
     resetCountdown,
     progressPercentage,
     elapsedTime,
+    lastElapsedRef,
+    setElapsedTime,
   } = useCountdown({
     minutes: 0,
     seconds: 5,
@@ -74,6 +75,7 @@ export default function TimerComponent() {
 
   const handleEndSession = () => {
     setShowModal(false);
+    setBreakCompleteModal(false);
     setMode("summary");
     resetCountdown();
   }
@@ -154,14 +156,11 @@ export default function TimerComponent() {
                 Back to work!
               </button>
               <button
-                className="btn btn-ghost"
-                  onClick={() => {
-                    setBreakCompleteModal(false);
-                    setMode("study");
-                  }}
+                  className="btn btn-ghost"
+                  onClick={handleEndSession}
                 >
                   End Study Session
-              </button>
+                </button>
             </div>
           </div>
         </div>

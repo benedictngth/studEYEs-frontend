@@ -26,6 +26,8 @@ export const useCountdown = (options: CountdownOptions) => {
   const timerRef = useRef<number>(initialTotalSecond)
   //used to keep track of whether the countdown has completed
   const completedRef = useRef<boolean>(false);
+  //used to track total elapsed time
+  const lastElapsedRef = useRef<number>(0);
 
   const updateTime = (total: number) => {
     setMinutes(Math.floor((total % 3600) / 60));
@@ -34,11 +36,11 @@ export const useCountdown = (options: CountdownOptions) => {
 
   const updateProgress = (elapsed: number) => {
     setElapsedTime(elapsed);
+    lastElapsedRef.current = elapsed;
     setProgressPercentage(Math.round((elapsed / initialTotalSecond) * 100));
   };
 
   const startCountdown = () => {
-    console.log("startCountdown called");
     setIsTimerRunning(true);
     completedRef.current = false;
     
@@ -74,6 +76,8 @@ export const useCountdown = (options: CountdownOptions) => {
     setIsTimerRunning(false);
     setRemainingTotal(initialTotalSecond);
     updateTime(initialTotalSecond);
+    setElapsedTime(0);
+    lastElapsedRef.current = 0;
     setProgressPercentage(0);
     completedRef.current = false;
   };
@@ -96,6 +100,7 @@ export const useCountdown = (options: CountdownOptions) => {
     seconds,
     isTimerRunning,
     elapsedTime,
+    lastElapsedRef,
     setElapsedTime,
     progressPercentage,
     startCountdown,
