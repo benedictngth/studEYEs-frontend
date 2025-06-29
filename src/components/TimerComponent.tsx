@@ -17,7 +17,7 @@ export default function TimerComponent() {
   const [timercycle, setTimerCycle] = useState(0);
   const [totalBreaks, setTotalBreaks] = useState(0);
   const [totalStudyDuration, setTotalStudyDuration] = useState(0);
-  
+
   const handleStudyComplete = () => {
     setTimerCycle((prev) => prev + 1);
     setTimeout(() => {
@@ -25,7 +25,7 @@ export default function TimerComponent() {
       setElapsedTime(0);
     }, 0);
     setShowModal(true);
-  }
+  };
   const handleBreakComplete = () => {
     setBreakCompleteModal(true);
   };
@@ -55,6 +55,14 @@ export default function TimerComponent() {
     }
   };
 
+  const handleEndSession = () => {
+    setShowModal(false);
+    setBreakCompleteModal(false);
+    setMode("summary");
+    resetCountdown();
+  };
+
+  //hook for studyTimer component
   const {
     minutes,
     seconds,
@@ -67,23 +75,15 @@ export default function TimerComponent() {
     lastElapsedRef,
     setElapsedTime,
   } = useCountdown({
-    minutes: 0,
-    seconds: 5,
+    minutes: 15,
+    seconds: 0,
     onComplete: handleStudyComplete,
   });
 
-
-  const handleEndSession = () => {
-    setShowModal(false);
-    setBreakCompleteModal(false);
-    setMode("summary");
-    resetCountdown();
-  }
-  
   return (
     <div className="App mt-10 mx-auto text-center">
       {mode === "study" && (
-        <StudyTimer 
+        <StudyTimer
           minutes={minutes}
           seconds={seconds}
           isTimerRunning={isTimerRunning}
@@ -102,15 +102,15 @@ export default function TimerComponent() {
       )}
       {mode === "summary" && (
         <SummaryPage
-        totalStudySessions = {timercycle}
-        totalBreaks = {totalBreaks}
-        totalStudyDuration= {totalStudyDuration}
-        onClose={() => {
-          setMode("study");
-          resetCountdown();
-          setTimerCycle(0);
-          setTotalBreaks(0);
-          setTotalStudyDuration(0);
+          totalStudySessions={timercycle}
+          totalBreaks={totalBreaks}
+          totalStudyDuration={totalStudyDuration}
+          onClose={() => {
+            setMode("study");
+            resetCountdown();
+            setTimerCycle(0);
+            setTotalBreaks(0);
+            setTotalStudyDuration(0);
           }}
         />
       )}
@@ -127,10 +127,7 @@ export default function TimerComponent() {
                 >
                   Break Time!
                 </button>
-                <button
-                  className="btn btn-ghost"
-                  onClick={handleEndSession}
-                >
+                <button className="btn btn-ghost" onClick={handleEndSession}>
                   End Study Session
                 </button>
               </div>
@@ -155,12 +152,9 @@ export default function TimerComponent() {
               >
                 Back to work!
               </button>
-              <button
-                  className="btn btn-ghost"
-                  onClick={handleEndSession}
-                >
-                  End Study Session
-                </button>
+              <button className="btn btn-ghost" onClick={handleEndSession}>
+                End Study Session
+              </button>
             </div>
           </div>
         </div>
