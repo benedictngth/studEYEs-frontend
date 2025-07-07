@@ -20,8 +20,8 @@ export default function BreakTimer({
     resetCountdown,
     progressPercentage,
   } = useCountdown({
-    minutes: 3,
-    seconds: 0,
+    minutes: 0,
+    seconds: 3,
     onComplete,
   });
   const displayTime = `${String(minutes).padStart(2, "0")}:${String(
@@ -44,7 +44,9 @@ export default function BreakTimer({
       </div>
 
       {breakLoading ? (
-        <span className="loading loading-spinner loading-sm"></span>
+        <div className="flex flex-col items-center">
+          <span className="loading loading-spinner loading-sm mt-2"></span>
+        </div>
       ) : (
         <div className="mb-4 p-2 bg-blue-100 text-blue-800 rounded shadow max-w-md mx-auto text-center">
           <p className="italic"> {message}</p>

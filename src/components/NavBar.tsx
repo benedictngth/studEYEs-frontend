@@ -7,7 +7,7 @@ const Navbar = () => {
     document.querySelector("html")?.setAttribute("data-theme", localTheme);
   }, [theme]);
 
-  const handleToggle = (e) => {
+  const handleToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       setTheme("garden");
     } else {

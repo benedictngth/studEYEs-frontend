@@ -41,8 +41,8 @@ const StatisticsPage = () => {
                   ? new Date(stat.created_at).toLocaleDateString()
                   : "N/A"}
               </td>
-              <td>{stat.totalStudyDuration * 60} mins</td>
-              <td>{stat.totalBreak * 60} mins</td>
+              <td>{stat.totalStudyDuration} mins</td>
+              <td>{stat.totalBreak} mins</td>
             </tr>
           ))}
         </tbody>

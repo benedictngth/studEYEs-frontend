@@ -4,10 +4,11 @@ import StudyTimer from "./StudyTimer";
 import BreakTimer from "./BreakTimer";
 import SummaryPage from "./SummaryPage";
 import { fetchBreakFact } from "../lib/fetchBreakFact";
+import supabase from "../utils/supabase";
 
 export default function TimerComponent() {
   //onComplete prop is a function that will be called when the timer completes
-  //now when click end study session, TODO what happens next?
+  //parent component for timers (study, break, summary)
   type TimerMode = "study" | "break" | "summary";
   const [mode, setMode] = useState<TimerMode>("study");
   const [breakCompleteModal, setBreakCompleteModal] = useState(false);
@@ -15,7 +16,7 @@ export default function TimerComponent() {
   const [showModal, setShowModal] = useState(false);
   const [breakMsg, setBreakMsg] = useState("");
   const [timercycle, setTimerCycle] = useState(0);
-  const [totalBreaks, setTotalBreaks] = useState(0);
+  const [totalBreak, setTotalBreak] = useState(0);
   const [totalStudyDuration, setTotalStudyDuration] = useState(0);
 
   const handleStudyComplete = () => {
@@ -39,7 +40,7 @@ export default function TimerComponent() {
     console.log("pastBreakFact", pastBreakFact);
     setShowModal(false);
     setMode("break");
-    setTotalBreaks((prev) => prev + 1);
+    setTotalBreak((prev) => prev + 1);
 
     // Fetch a new break fact, passing the past fact to avoid repetition
     setBreakLoading(true);
@@ -62,6 +63,21 @@ export default function TimerComponent() {
     resetCountdown();
   };
 
+  const handleEndSummary = async () => {
+    const { error } = await supabase.from("session").insert({
+      created_at: new Date().toISOString(),
+      totalStudyDuration,
+      totalBreak,
+    });
+
+    console.log(error);
+    setMode("study");
+    resetCountdown();
+    setTimerCycle(0);
+    setTotalBreak(0);
+    setTotalStudyDuration(0);
+  };
+
   //hook for studyTimer component
   const {
     minutes,
@@ -71,12 +87,11 @@ export default function TimerComponent() {
     pauseCountdown,
     resetCountdown,
     progressPercentage,
-    elapsedTime,
     lastElapsedRef,
     setElapsedTime,
   } = useCountdown({
-    minutes: 15,
-    seconds: 0,
+    minutes: 0,
+    seconds: 3,
     onComplete: handleStudyComplete,
   });
 
@@ -103,15 +118,9 @@ export default function TimerComponent() {
       {mode === "summary" && (
         <SummaryPage
           totalStudySessions={timercycle}
-          totalBreaks={totalBreaks}
+          totalBreaks={totalBreak}
           totalStudyDuration={totalStudyDuration}
-          onClose={() => {
-            setMode("study");
-            resetCountdown();
-            setTimerCycle(0);
-            setTotalBreaks(0);
-            setTotalStudyDuration(0);
-          }}
+          onClose={handleEndSummary}
         />
       )}
 
