@@ -1,15 +1,11 @@
-import Navbar from "./components/NavBar";
-import TimerComponent from "./components/TimerComponent";
+import Home from "./components/home";
 import "./App.css";
 
 function App() {
   return (
-    <main>
-      <Navbar />
-      <div>
-        <TimerComponent />
-      </div>
-    </main>
+    <>
+      <Home />
+    </>
   );
 }
 
