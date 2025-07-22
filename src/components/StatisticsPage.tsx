@@ -8,45 +8,96 @@ interface Stat {
 }
 const StatisticsPage = () => {
   const [stats, setStats] = useState<Stat[]>([]);
+  const [timePeriod, setTimePeriod] = useState<"day"|"week"|"month"|"alltime">("alltime");
 
   useEffect(() => {
-    async function getStats() {
-      const { data: stats } = await supabase.from("session").select();
+    async function getStats(filter: "day"|"week"|"month"|"alltime") {
+      let query = supabase.from("session").select("*");
+      
+      if (filter !== "alltime") {
+        const now = new Date();
+        let since: Date | undefined = undefined;
 
-      if (stats && stats.length >= 1) {
+        if (filter === "day") {
+          since = new Date();
+          since.setHours(0, 0, 0, 0); // only retrieve those aft midnite accord to pc timezone
+        } else if (filter === "week") {
+          since = new Date();
+          const day = since.getDay();
+          const diff = day === 0 ? -6 : 1 - day; 
+          since.setDate(since.getDate() + diff); // set back to monday since default is sun
+          since.setHours(0, 0, 0, 0); // start fr midnight
+        } else if (filter === "month") {
+          since = new Date(now.getFullYear(), now.getMonth(), 1); // 1st day of each mth for mth filter
+        }
+        
+        if (since) {
+          query = query.gte("created_at", since.toISOString());
+        }
+      }
+
+      const { data: stats, error } = await query;
+      if (error) {
+        console.error("Error fetching stats:", error);
+      } else if (stats) {
         setStats(stats);
       }
     }
-    getStats();
-  }, []);
+
+    getStats(timePeriod);
+  }, [timePeriod]);
 
   return (
-    <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-      <table className="table">
-        {/* head */}
-        <thead>
-          <tr>
-            <th></th>
-            <th>Date</th>
-            <th>Total study duration</th>
-            <th>Total break duration</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stats.map((stat) => (
-            <tr key={stat.id}>
-              <th>{stat.id}</th>
-              <td>
-                {stat.created_at
-                  ? new Date(stat.created_at).toLocaleDateString()
-                  : "N/A"}
-              </td>
-              <td>{stat.totalStudyDuration} mins</td>
-              <td>{stat.totalBreak} mins</td>
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6"> Study Statistics</h1>
+
+      <div className="join mb-6">
+        {["day", "week", "month", "alltime"].map((period) => (
+          <button
+            key={period}
+            onClick={() => setTimePeriod(period as typeof timePeriod)}
+            className={`join-item btn btn-sm ${
+              timePeriod === period ? "btn-primary" : "btn-outline"
+            }`}
+          >
+            {period === "day" && "Today"}
+            {period === "week" && "This Week"}
+            {period === "month" && "This Month"}
+            {period === "alltime" && "All Time"}
+          </button>
+        ))}
+      </div>
+
+      <div className="overflow-x-auto bg-base-100 rounded-box shadow border border-base-content/10">
+        <table className="table table-zebra">
+          <thead>
+            <tr className="text-base-content/70">
+              <th>#</th>
+              <th>Date</th>
+              <th>Total Study</th>
+              <th>Total Break</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {stats.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center py-6 text-base-content/50">
+                  No records found for selected time period.
+                </td>
+              </tr>
+            ) : (
+              stats.map((stat) => (
+                <tr key={stat.id}>
+                  <td>{stat.id}</td>
+                  <td>{new Date(stat.created_at).toLocaleDateString()}</td>
+                  <td>{stat.totalStudyDuration} mins</td>
+                  <td>{stat.totalBreak} mins</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
