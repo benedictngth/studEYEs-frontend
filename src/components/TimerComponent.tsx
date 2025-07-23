@@ -5,6 +5,7 @@ import BreakTimer from "./BreakTimer";
 import SummaryPage from "./SummaryPage";
 import { fetchBreakFact } from "../lib/fetchBreakFact";
 import supabase from "../utils/supabase";
+import { useSession } from "../context/AuthContext";
 
 export default function TimerComponent() {
   //onComplete prop is a function that will be called when the timer completes
@@ -18,6 +19,7 @@ export default function TimerComponent() {
   const [timercycle, setTimerCycle] = useState(0);
   const [totalBreak, setTotalBreak] = useState(0);
   const [totalStudyDuration, setTotalStudyDuration] = useState(0);
+  const { session } = useSession();
 
   const handleStudyComplete = () => {
     setTimerCycle((prev) => prev + 1);
@@ -56,21 +58,28 @@ export default function TimerComponent() {
     }
   };
 
-  const handleEndSession = () => {
+  const handleEndSession = async () => {
     setShowModal(false);
     setBreakCompleteModal(false);
     setMode("summary");
     resetCountdown();
-  };
-
-  const handleEndSummary = async () => {
+    
+    if (!session?.user.id) {
+      console.error("User not authenticated.");
+      return;
+    }
+  
     const { error } = await supabase.from("session").insert({
+      user_id: session?.user.id,
       created_at: new Date().toISOString(),
       totalStudyDuration,
       totalBreak,
     });
 
     console.log(error);
+  };
+
+  const handleEndSummary = () => {
     setMode("study");
     resetCountdown();
     setTimerCycle(0);
