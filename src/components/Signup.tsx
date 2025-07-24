@@ -31,9 +31,7 @@ const Signup = () => {
     <div>
       <form onSubmit={handleSignUp}>
         <h2>Sign up to studEyEs</h2>
-        <p>
-          Already have an account<Link to="/"> Sign In</Link>
-        </p>
+
         <div className="flex flex-col ">
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -48,10 +46,13 @@ const Signup = () => {
             className="input"
           />
           <button type="submit" disabled={loading} className="btn">
-            Submit
+            Sign Up
           </button>
         </div>
       </form>
+      <p>
+        Already have an account<Link to="/"> Sign In</Link>
+      </p>
     </div>
   );
 };

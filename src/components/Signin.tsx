@@ -36,9 +36,7 @@ const Signin = () => {
     <div>
       <form onSubmit={handleSignIn}>
         <h2>Sign in to studEyEs</h2>
-        <p>
-          Don't have an account? <a href="/signup">Sign up</a>
-        </p>
+
         <div className="flex flex-col">
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -62,6 +60,9 @@ const Signin = () => {
           {error && <p className="error-message">{error}</p>}
         </div>
       </form>
+      <p>
+        Don't have an account? <a href="/signup">Sign up</a>
+      </p>
     </div>
   );
 };
