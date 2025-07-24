@@ -7,6 +7,7 @@ interface Stat {
   created_at: string;
   totalStudyDuration: number;
   totalBreak: number;
+  title: string;
 }
 const StatisticsPage = () => {
   const [stats, setStats] = useState<Stat[]>([]);
@@ -73,8 +74,8 @@ const StatisticsPage = () => {
   const formatMinutes = (secs: number) => {
     console.log(secs);
     const h = Math.floor(secs / 3600);
-    const m = Math.round(secs / 60);
-    const s = Math.round(secs % 60);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = Math.floor(secs % 60);
     return `${h > 0 ? `${h}h ` : ""}${m}m ${s}s`;
   };
 
@@ -126,9 +127,10 @@ const StatisticsPage = () => {
             <thead>
               <tr className="text-base-content/70">
                 <th>#</th>
+                <th>Title</th>
                 <th>Date</th>
-                <th>Total Study</th>
-                <th>Total Break</th>
+                <th>Total Study Duration</th>
+                <th>Number of Breaks</th>
               </tr>
             </thead>
             <tbody>
@@ -145,9 +147,10 @@ const StatisticsPage = () => {
                 stats.map((stat, index) => (
                   <tr key={stat.id}>
                     <td>{index + 1}</td>
+                    <td>{stat.title}</td>
                     <td>{new Date(stat.created_at).toLocaleDateString()}</td>
-                    <td>{stat.totalStudyDuration} secs</td>
-                    <td>{stat.totalBreak} secs</td>
+                    <td>{formatMinutes(stat.totalStudyDuration)}</td>
+                    <td>{stat.totalBreak}</td>
                   </tr>
                 ))
               )}

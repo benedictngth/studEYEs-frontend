@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCountdown } from "../hooks/useTimer";
 import StudyTimer from "./StudyTimer";
 import BreakTimer from "./BreakTimer";
@@ -22,7 +22,8 @@ export default function TimerComponent() {
   const { session } = useSession();
   const [studyDurationMin, setStudyDurationMin] = useState<number>(15);
   const [studyDurationSec, setStudyDurationSec] = useState<number>(0);
-
+  const [sessionTitle, setSessionTitle] = useState("");
+  
   const handleStudyComplete = () => {
     setTimerCycle((prev) => prev + 1);
     setTimeout(() => {
@@ -63,6 +64,9 @@ export default function TimerComponent() {
   const handleEndSession = async () => {
     setShowModal(false);
     setBreakCompleteModal(false);
+    const currentElapsed = (studyDurationMin * 60 + studyDurationSec) - (minutes * 60 + seconds);
+    const updatedTotal = totalStudyDuration + currentElapsed;
+    setTotalStudyDuration(updatedTotal);
     setMode("summary");
     resetCountdown();
 
@@ -74,8 +78,9 @@ export default function TimerComponent() {
     const { error } = await supabase.from("session").insert({
       user_id: session?.user.id,
       created_at: new Date().toISOString(),
-      totalStudyDuration,
+      totalStudyDuration: updatedTotal,
       totalBreak,
+      title: sessionTitle,
     });
 
     console.log(error);
@@ -106,6 +111,12 @@ export default function TimerComponent() {
     onComplete: handleStudyComplete,
   });
 
+  useEffect(() => {
+    if (!isTimerRunning) {
+      resetCountdown();
+    }
+  }, [studyDurationMin, studyDurationSec]);
+
   return (
     <div className="App mt-10 mx-auto text-center">
       {mode === "study" && (
@@ -121,6 +132,9 @@ export default function TimerComponent() {
           setStudyDurationMin={setStudyDurationMin}
           studyDurationMin={studyDurationMin}
           studyDurationSec={studyDurationSec}
+          onEndSession={handleEndSession}
+          sessionTitle={sessionTitle}
+          setSessionTitle={setSessionTitle}
         />
       )}
       {mode === "break" && (
@@ -136,6 +150,8 @@ export default function TimerComponent() {
           totalBreaks={totalBreak}
           totalStudyDuration={totalStudyDuration}
           onClose={handleEndSummary}
+          sessionTitle={sessionTitle}
+          setSessionTitle={setSessionTitle}
         />
       )}
 

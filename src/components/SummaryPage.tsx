@@ -1,9 +1,9 @@
-import { useState } from "react";
-
 interface SumProps {
     totalStudySessions: number;
     totalBreaks: number;
     totalStudyDuration: number;
+    sessionTitle: string;
+    setSessionTitle: (title: string) => void;
     onClose: () => void;
 }
 
@@ -11,18 +11,10 @@ export default function SummaryPage({
     totalStudySessions,
     totalBreaks,
     totalStudyDuration,
+    sessionTitle,
+    setSessionTitle,
     onClose,
 }: SumProps) {
-    const [title, setTitle] = useState(() => {
-        const today = new Date().toLocaleDateString(undefined, {
-            weekday: "long",
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-        return `Study Session on ${today}`;
-    });
-
     const formatDuration = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -34,11 +26,7 @@ export default function SummaryPage({
       <div className="card-body items-center text-center">
         <h2 className="card-title text-2xl">Session Summary</h2>
 
-        <input
-          className="input input-bordered text-lg font-semibold text-center w-full max-w-md mt-4"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+        <h3 className="text-xl font-semibold mt-4">{sessionTitle}</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 w-full max-w-xl">
           <div className="stats shadow bg-base-200">
@@ -64,7 +52,12 @@ export default function SummaryPage({
         </div>
 
         <div className="mt-6">
-          <button className="btn btn-primary" onClick={onClose}>
+          <button className="btn btn-primary" 
+          onClick={() => {
+            setSessionTitle("");
+            onClose();
+          }}
+          >
             Start New Session
           </button>
         </div>
