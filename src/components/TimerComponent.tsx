@@ -20,6 +20,8 @@ export default function TimerComponent() {
   const [totalBreak, setTotalBreak] = useState(0);
   const [totalStudyDuration, setTotalStudyDuration] = useState(0);
   const { session } = useSession();
+  const [studyDurationMin, setStudyDurationMin] = useState<number>(15);
+  const [studyDurationSec, setStudyDurationSec] = useState<number>(0);
 
   const handleStudyComplete = () => {
     setTimerCycle((prev) => prev + 1);
@@ -63,12 +65,12 @@ export default function TimerComponent() {
     setBreakCompleteModal(false);
     setMode("summary");
     resetCountdown();
-    
+
     if (!session?.user.id) {
       console.error("User not authenticated.");
       return;
     }
-  
+
     const { error } = await supabase.from("session").insert({
       user_id: session?.user.id,
       created_at: new Date().toISOString(),
@@ -99,8 +101,8 @@ export default function TimerComponent() {
     lastElapsedRef,
     setElapsedTime,
   } = useCountdown({
-    minutes: 0,
-    seconds: 3,
+    minutes: studyDurationMin,
+    seconds: studyDurationSec,
     onComplete: handleStudyComplete,
   });
 
@@ -115,6 +117,10 @@ export default function TimerComponent() {
           pauseCountdown={pauseCountdown}
           resetCountdown={resetCountdown}
           progressPercentage={progressPercentage}
+          setStudyDurationSec={setStudyDurationSec}
+          setStudyDurationMin={setStudyDurationMin}
+          studyDurationMin={studyDurationMin}
+          studyDurationSec={studyDurationSec}
         />
       )}
       {mode === "break" && (

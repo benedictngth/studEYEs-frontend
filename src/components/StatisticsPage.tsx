@@ -10,7 +10,9 @@ interface Stat {
 }
 const StatisticsPage = () => {
   const [stats, setStats] = useState<Stat[]>([]);
-  const [timePeriod, setTimePeriod] = useState<"day"|"week"|"month"|"alltime">("alltime");
+  const [timePeriod, setTimePeriod] = useState<
+    "day" | "week" | "month" | "alltime"
+  >("alltime");
   const [summary, setSummary] = useState({
     totalDuration: 0,
     avgDuration: 0,
@@ -21,9 +23,9 @@ const StatisticsPage = () => {
   };
 
   useEffect(() => {
-    async function getStats(filter: "day"|"week"|"month"|"alltime") {
+    async function getStats(filter: "day" | "week" | "month" | "alltime") {
       let query = supabase.from("session").select("*");
-      
+
       if (filter !== "alltime") {
         const now = new Date();
         let since: Date | undefined = undefined;
@@ -34,13 +36,13 @@ const StatisticsPage = () => {
         } else if (filter === "week") {
           since = new Date();
           const day = since.getDay();
-          const diff = day === 0 ? -6 : 1 - day; 
+          const diff = day === 0 ? -6 : 1 - day;
           since.setDate(since.getDate() + diff); // set back to monday since default is sun
           since.setHours(0, 0, 0, 0); // start fr midnight
         } else if (filter === "month") {
           since = new Date(now.getFullYear(), now.getMonth(), 1); // 1st day of each mth for mth filter
         }
-        
+
         if (since) {
           query = query.gte("created_at", since.toISOString());
         }
@@ -52,7 +54,10 @@ const StatisticsPage = () => {
       } else if (stats) {
         setStats(stats);
 
-        const totalDuration = stats.reduce((sum, s) => sum + s.totalStudyDuration, 0);
+        const totalDuration = stats.reduce(
+          (sum, s) => sum + s.totalStudyDuration,
+          0
+        );
         const avgDuration = stats.length > 0 ? totalDuration / stats.length : 0;
 
         setSummary({
@@ -65,11 +70,12 @@ const StatisticsPage = () => {
     getStats(timePeriod);
   }, [timePeriod]);
 
-
-  const formatMinutes = (min: number) => {
-    const h = Math.floor(min / 60);
-    const m = Math.round(min % 60);
-    return `${h > 0 ? `${h}h ` : ""}${m}m`;
+  const formatMinutes = (secs: number) => {
+    console.log(secs);
+    const h = Math.floor(secs / 3600);
+    const m = Math.round(secs / 60);
+    const s = Math.round(secs % 60);
+    return `${h > 0 ? `${h}h ` : ""}${m}m ${s}s`;
   };
 
   return (
@@ -81,7 +87,6 @@ const StatisticsPage = () => {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
-
         <h1 className="text-3xl font-bold mb-6"> Study Statistics</h1>
 
         <div className="join mb-6">
@@ -104,11 +109,15 @@ const StatisticsPage = () => {
         <div className="w-full stats shadow mb-6 bg-base-200">
           <div className="stat">
             <div className="stat-title">Total Study Time</div>
-            <div className="stat-value">{formatMinutes(summary.totalDuration)}</div>
+            <div className="stat-value">
+              {formatMinutes(summary.totalDuration)}
+            </div>
           </div>
           <div className="stat">
             <div className="stat-title">Avg. Session Length</div>
-            <div className="stat-value">{formatMinutes(summary.avgDuration)}</div>
+            <div className="stat-value">
+              {formatMinutes(summary.avgDuration)}
+            </div>
           </div>
         </div>
 
@@ -125,7 +134,10 @@ const StatisticsPage = () => {
             <tbody>
               {stats.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="text-center py-6 text-base-content/50">
+                  <td
+                    colSpan={4}
+                    className="text-center py-6 text-base-content/50"
+                  >
                     No records found for selected time period.
                   </td>
                 </tr>
@@ -134,8 +146,8 @@ const StatisticsPage = () => {
                   <tr key={stat.id}>
                     <td>{index + 1}</td>
                     <td>{new Date(stat.created_at).toLocaleDateString()}</td>
-                    <td>{stat.totalStudyDuration} mins</td>
-                    <td>{stat.totalBreak} mins</td>
+                    <td>{stat.totalStudyDuration} secs</td>
+                    <td>{stat.totalBreak} secs</td>
                   </tr>
                 ))
               )}

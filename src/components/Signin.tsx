@@ -11,7 +11,6 @@ const Signin = () => {
   const [error, setError] = useState<string | null>(null);
   const { session } = useSession();
 
-  console.log(session);
   useEffect(() => {
     if (session) {
       navigate("/dashboard");
@@ -29,6 +28,7 @@ const Signin = () => {
     });
     if (error) {
       alert(error.message);
+      setLoading(false);
     }
   };
 

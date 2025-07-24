@@ -1,13 +1,19 @@
+import type { Dispatch, SetStateAction } from "react";
+
 interface TimerProps {
   minutes: number;
   seconds: number;
   isTimerRunning: boolean;
+  setStudyDurationMin: Dispatch<SetStateAction<number>>;
+  setStudyDurationSec: Dispatch<SetStateAction<number>>;
+  studyDurationMin: number;
+  studyDurationSec: number;
   startCountdown: () => void;
   pauseCountdown: () => void;
   resetCountdown: () => void;
   progressPercentage: number;
 }
-export default function StudyTimer({ 
+export default function StudyTimer({
   minutes,
   seconds,
   isTimerRunning,
@@ -15,10 +21,29 @@ export default function StudyTimer({
   pauseCountdown,
   resetCountdown,
   progressPercentage,
- }: TimerProps) {
+  studyDurationMin,
+  studyDurationSec,
+  setStudyDurationSec,
+  setStudyDurationMin,
+}: TimerProps) {
   const displayTime = `${String(minutes).padStart(2, "0")}:${String(
     seconds
   ).padStart(2, "0")}`;
+
+  const handleMinuteChange = (newMinutes: number) => {
+    setStudyDurationMin(newMinutes);
+    if (!isTimerRunning) {
+      resetCountdown(); // Immediately update countdown display
+    }
+  };
+
+  const handleSecondChange = (newSeconds: number) => {
+    setStudyDurationSec(newSeconds);
+    if (!isTimerRunning) {
+      resetCountdown(); // Immediately update countdown display
+    }
+  };
+
   return (
     <div>
       <div
@@ -56,6 +81,24 @@ export default function StudyTimer({
         >
           Reset
         </button>
+      </div>
+      <div className="flex py-4 justify-center">
+        <input
+          type="number"
+          min="0"
+          value={studyDurationMin}
+          className="input"
+          onChange={(e) => handleMinuteChange(Number(e.target.value))}
+          disabled={isTimerRunning} // Prevent changes during timer
+        />
+        <input
+          type="number"
+          min="0"
+          value={studyDurationSec}
+          className="input"
+          onChange={(e) => handleSecondChange(Number(e.target.value))}
+          disabled={isTimerRunning} // Prevent changes during timer
+        />
       </div>
     </div>
   );

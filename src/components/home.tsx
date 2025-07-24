@@ -24,7 +24,6 @@ function Home() {
       console.error("Error signing out", error);
     }
   };
-  console.log(session);
   return (
     <main>
       <Navbar />
