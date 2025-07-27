@@ -86,7 +86,7 @@ export default function TimerComponent() {
       created_at: new Date().toISOString(),
       totalStudyDuration: updatedTotal,
       totalBreak,
-      title: sessionTitle,
+      title: sessionTitle || "Study Session",
     });
 
     console.log(error);
