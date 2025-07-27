@@ -64,9 +64,15 @@ export default function TimerComponent() {
   const handleEndSession = async () => {
     setShowModal(false);
     setBreakCompleteModal(false);
-    const currentElapsed = (studyDurationMin * 60 + studyDurationSec) - (minutes * 60 + seconds);
-    const updatedTotal = totalStudyDuration + currentElapsed;
-    setTotalStudyDuration(updatedTotal);
+
+    let updatedTotal = totalStudyDuration;
+
+    if (isTimerRunning) {
+      const currentElapsed = (studyDurationMin * 60 + studyDurationSec) - (minutes * 60 + seconds);
+      const updatedTotal = totalStudyDuration + currentElapsed;
+      setTotalStudyDuration(updatedTotal);
+    }
+    
     setMode("summary");
     resetCountdown();
 
