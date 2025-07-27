@@ -20,7 +20,7 @@ export default function BreakTimer({
     resetCountdown,
     progressPercentage,
   } = useCountdown({
-    minutes: 3,
+    minutes: 5,
     seconds: 0,
     onComplete,
   });

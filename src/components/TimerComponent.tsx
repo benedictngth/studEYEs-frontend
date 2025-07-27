@@ -20,7 +20,7 @@ export default function TimerComponent() {
   const [totalBreak, setTotalBreak] = useState(0);
   const [totalStudyDuration, setTotalStudyDuration] = useState(0);
   const { session } = useSession();
-  const [studyDurationMin, setStudyDurationMin] = useState<number>(15);
+  const [studyDurationMin, setStudyDurationMin] = useState<number>(25);
   const [studyDurationSec, setStudyDurationSec] = useState<number>(0);
   const [sessionTitle, setSessionTitle] = useState("");
   
@@ -72,7 +72,7 @@ export default function TimerComponent() {
       const updatedTotal = totalStudyDuration + currentElapsed;
       setTotalStudyDuration(updatedTotal);
     }
-    
+
     setMode("summary");
     resetCountdown();
 
